@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="static/dist/css/bootstrap.css">
+    <script src="static/dist/js/jquery.min.js"></script>
+    <script src="static/dist/js/jquery-3.3.1.js"></script>
+    <script src="static/dist/js/host.js"></script>
+
+</head>
+<body>
+
+<div class="list-group">
+<!--    <a href="#" class="list-group-item list-group-item-success">-->
+<!--        <button id="" type="button" class="btn btn-success">-->
+<!--            <span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span>-->
+<!--        </button>-->
+<!--        <button type="button" class="btn btn-danger">-->
+<!--            <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>-->
+<!--        </button>-->
+<!--        The First Article-->
+<!--        <span class="badge">14</span>-->
+<!--    </a>-->
+<!--    <a href="#" class="list-group-item list-group-item-info">Cras sit amet nibh libero  <span class="badge">14</span></a>-->
+<!--    <a href="#" class="list-group-item list-group-item-warning">Porta ac consectetur ac  <span class="badge">14</span></a>-->
+<!--    <a href="#" class="list-group-item list-group-item-danger">Vestibulum at eros  <span class="badge">14</span></a>-->
+</div>
+
+<script>
+    var article_list = [];
+    $(document).ready(function() {
+
+        $.ajax({
+            type: "GET",
+            url: "http://"+host+"/post/getAllbyTime",
+            xhrFields:{
+                withCredentials:true,
+            },
+            success: function(data) {
+                if (data.status == "success") {
+                    article_list = data.data;
+
+                    reloadDom();
+                } else {
+                    alert("获取商品信息失败，原因为" + data.data.errMsg);
+                }
+            },
+            error: function(data) {
+                alert("获取商品信息失败，原因为" + data.responseText);
+            }
+        });
+    });
+
+    function reloadDom() {
+        var dom = '';
+        for (var key in article_list) {
+            dom += '<a href="'+article_list[key].link+'" class="list-group-item list-group-item-success">\n' +
+                '        <button id="" onclick="incr(article_list[key])"  type="button" class="btn btn-success">\n' +
+                '            <span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span>\n' +
+                '        </button>\n' +
+                '        <button onclick="decr(article_list[key])" type="button" class="btn btn-danger">\n' +
+                '            <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>\n' +
+                '        </button>\n' +
+                '        '+article_list[key].title+'\n' +
+                '        <span class="badge">'+article_list[key].votes+'</span>\n' +
+                '    </a>\n';
+        }
+
+
+        $(".list-group").append($(dom));
+    }
+    function incr(article) {
+        $.ajax({
+            type: "POST",
+            url: "http://"+host+"/post/incr"+article,
+            xhrFields:{
+                withCredentials:true,
+            },
+            success: function(data) {
+                if (data.status == "success") {
+
+                } else {
+                    alert("获取商品信息失败，原因为" + data.data.errMsg);
+                }
+            },
+            error: function(data) {
+                alert("获取商品信息失败，原因为" + data.responseText);
+            }
+        });
+    }
+    function decr(article) {
+        $.ajax({
+            type: "POST",
+            url: "http://"+host+"/post/decr"+article,
+            xhrFields:{
+                withCredentials:true,
+            },
+            success: function(data) {
+                if (data.status == "success") {
+
+                } else {
+                    alert("获取商品信息失败，原因为" + data.data.errMsg);
+                }
+            },
+            error: function(data) {
+                alert("获取商品信息失败，原因为" + data.responseText);
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>
