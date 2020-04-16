@@ -1,12 +1,20 @@
 package top.theanything.forum.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import top.theanything.forum.annotations.TokenValidation;
+import top.theanything.forum.error.BusinessException;
+import top.theanything.forum.error.EmBusinessException;
 import top.theanything.forum.pojo.Article;
 import top.theanything.forum.response.CommonReturnType;
+import top.theanything.forum.utils.JwtUtils;
+import top.theanything.forum.utils.SpringContextUtil;
 
 import javax.annotation.PostConstruct;
+import javax.swing.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,18 +28,24 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @Description
  * @createTime 2020年04月15日 20:37:00
  */
+@Slf4j
 @RestController
 @RequestMapping("/post")
 @CrossOrigin(allowCredentials="true", allowedHeaders = "*")
 public class PostController {
 
     private static final String ARTICLE_PREFIX = "article:";
-
-
-    @Autowired
-    private Jedis jedis;
-
+    //每天文章增加200票才会被认为是有趣的。
+    private static final int INCR_SCORE = 432;
     private  AtomicInteger id;
+    @Autowired
+    private JedisPool jedisPool;
+    @Autowired
+    private SpringContextUtil context;
+    @Autowired
+    private SpringContextUtil contextUtil;
+
+
 
     @PostConstruct
     public void init(){
@@ -39,27 +53,44 @@ public class PostController {
     }
 
     @GetMapping("/getAllbyTime")
+    @TokenValidation(true)
     public CommonReturnType getAllByTime(){
-        Set<String> articles = jedis.zrange("time", 0, -1);
+        String token = context.getRequest().getParameter("token");
+        String userId = JwtUtils.parse(token);
         HashMap<String, Article> article_list = new HashMap<>();
-
-        for (String id : articles) {
-            Article article = Article.builder()
-                    .title(jedis.hget( id, "title"))
-                    .poster(jedis.hget( id, "poster"))
-                    .link(jedis.hget(id, "link"))
-                    .time(jedis.hget( id, "time"))
-                    .votes(jedis.hget( id, "votes"))
-                    .build();
-            article_list.put( id,article);
-        }
+        Jedis jedis = null;
+       try {
+           jedis = jedisPool.getResource();
+           jedis.select(10);
+           Set<String> articles = jedis.zrange("time", 0, -1);
+           for (String id : articles) {
+               Article article = Article.builder()
+                       .title(jedis.hget( id, "title"))
+                       .poster(jedis.hget( id, "poster"))
+                       .link(jedis.hget(id, "link"))
+                       .time(jedis.hget( id, "time"))
+                       .votes(jedis.hget( id, "votes"))
+                       .build();
+               article_list.put( id,article);
+           }
+       }catch (Exception e){
+           log.warn("出错啦{}",e.getMessage());
+           throw  e;
+       }finally {
+           jedis.close();
+       }
         return CommonReturnType.create(article_list);
     }
 
-
+    //发表文章
     @PostMapping("/public")
+    @TokenValidation(true)
     public CommonReturnType publish(Article article){
+
+        //todo  增加分类
+        Jedis jedis = null;
        try {
+            jedis = jedisPool.getResource();
            //article表
            long time = System.currentTimeMillis()/1000;   //获取当前秒数
            String article_name = ARTICLE_PREFIX+id.getAndAdd(1);
@@ -77,10 +108,41 @@ public class PostController {
            //在分值排序的表添加该表
            jedis.zadd("score",Double.longBitsToDouble(time),article_name);
        }catch (Exception e){
+           log.warn("出错啦{}",e.getMessage());
            throw  e;
+       }finally {
+           jedis.close();
        }
        return CommonReturnType.create(null);
-
     }
+
+
+    @PostMapping("incr")
+    @TokenValidation
+    public CommonReturnType up(@RequestParam("article") String articleId) throws BusinessException {
+        String id = articleId.split(":")[1];
+        String userid = contextUtil.getUserid();
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            jedis.select(10);
+            //在文章点赞的用户中添加该用户
+            if (jedis.sadd("voted:" + id, "user:" + userid) == 0)
+                return CommonReturnType.create("滚，点过就不要点了","fail");
+            //如果添加成功
+            // (1)给文章加分数(86400/200)
+            // (2)在文章散列加上投票数
+            jedis.zincrby("score",INCR_SCORE,articleId);
+            jedis.hincrBy(articleId,"votes",1);
+        }catch (Exception e){
+            throw  new BusinessException(EmBusinessException.REDIS_BUSY);
+        }finally {
+            jedis.close();
+        }
+        return CommonReturnType.create(null);
+    }
+
+
+    // todo 踩
 
 }

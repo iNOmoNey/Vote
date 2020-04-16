@@ -24,4 +24,6 @@ top:
     host: localhost
     port: 6379
     select: 10
+    MAX_IDLE: 10
+    MAX_WAITMILLIS:
 

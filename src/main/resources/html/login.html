@@ -60,14 +60,14 @@
 
         var telphone = $("#inputPhone").val();
         var password = $("#inputPassword").val();
-        if (telphone == null || telphone == "") {
-          alert("手机号不能为空");
-          return false;
-        }
-        if (password == null || password == "") {
-          alert("密码不能为空");
-          return false;
-        }
+        // if (telphone == null || telphone == "") {
+        //   alert("手机号不能为空");
+        //   return false;
+        // }
+        // if (password == null || password == "") {
+        //   alert("密码不能为空");
+        //   return false;
+        // }
         $.ajax({
           type: "POST",
           // contentType: "application/x-www-form-urlencoded",
@@ -84,11 +84,11 @@
               window.localStorage["token"] = token;
               window.location.href = "vote.html";
             } else {
-              alert("登陆失败，原因为1" + data.data.errMsg);
+              alert(data.data.errMsg);
             }
           },
           error: function (data) {
-            alert("登陆失败，原因为2" + data.responseText);
+            alert(data.data.errMsg);
           }
         });
         return false;

@@ -2,10 +2,12 @@ package top.theanything.forum.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import sun.nio.ch.SelChImpl;
 
 import javax.sound.sampled.Port;
@@ -23,18 +25,30 @@ import javax.sound.sampled.Port;
 @Setter
 public class JedisConfig {
 
+    private static final int MAX_IDLE = 10;
+    private static final long MAX_WAITMILLIS = 1000;
+    private static final int MAX_TOTAL = 10;
+    private static final int MIN_IDLE = 2;
 
-    private String host;
-    private int port;
-    private int select;
 
+    private String HOST;
+    private int PORT;
+    private int SELECT;
 
 
     @Bean
-    public Jedis initJedis(){
-        Jedis jedis = new Jedis(host, port);
-        jedis.select(select);
-        return jedis;
+    public JedisPool initJedis(){
+         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+         config.setMaxIdle(MAX_IDLE);
+         config.setMaxWaitMillis(MAX_WAITMILLIS);
+         config.setMaxTotal(MAX_TOTAL);
+         config.setMinIdle(MIN_IDLE);
+
+
+
+        JedisPool jedisPool= new JedisPool(config,HOST,PORT);
+
+        return jedisPool;
     }
 
 }

@@ -10,6 +10,10 @@ import java.nio.ByteOrder;
  * @version 1.0.0
  * @ClassName UserServiceImpl.java
  * @Description
+ *
+ * 将用户密码用MurmursHash的方式加密
+ * 本人较懒，不加了
+ *
  * @createTime 2020年04月13日 21:27:00
  */
 public class MurmursHash {

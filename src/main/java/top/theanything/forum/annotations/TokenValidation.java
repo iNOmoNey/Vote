@@ -21,5 +21,5 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface TokenValidation {
 
-    boolean validation() default false;
+    boolean value() default true;
 }

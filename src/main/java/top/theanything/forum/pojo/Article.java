@@ -18,6 +18,7 @@ import lombok.Setter;
 @Builder
 public class Article {
 
+
     private String poster;
     private String title;
     private String link;
