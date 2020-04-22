@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import top.theanything.forum.App;
 import top.theanything.forum.dao.UserDOMapper;
+import top.theanything.forum.utils.JwtUtils;
 
 import java.util.Date;
 
@@ -17,11 +18,14 @@ import java.util.Date;
  * @Description
  * @createTime 2020年04月13日 22:49:00
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = App.class)
+
 public class InsertTest {
 
-
+    public static void main(String[] args) {
+//
+        String parse = JwtUtils.parse("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTEiLCJleHAiOjE1ODczODUwODV9.beyWZdsHpFunB3q2MbIKHxmVeFTmJLSLDVRjqflslaVPaqchyGiatJ3SCL58dYrOLzgmDvHjLE_l9ptczBzFDw");
+        System.out.println(parse);
+    }
 
 
 

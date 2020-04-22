@@ -2,6 +2,8 @@ package top.theanything.forum.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -29,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @createTime 2020年04月15日 20:37:00
  */
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/post")
 @CrossOrigin(allowCredentials="true", allowedHeaders = "*")
 public class PostController {
@@ -40,12 +42,9 @@ public class PostController {
     private  AtomicInteger id;
     @Autowired
     private JedisPool jedisPool;
-    @Autowired
-    private SpringContextUtil context;
-    @Autowired
-    private SpringContextUtil contextUtil;
 
-
+//    @Autowired
+//    private SpringContextUtil contextUtil;
 
     @PostConstruct
     public void init(){
@@ -53,9 +52,10 @@ public class PostController {
     }
 
     @GetMapping("/getAllbyTime")
-    @TokenValidation(true)
+    @TokenValidation()
+    @ResponseBody
     public CommonReturnType getAllByTime(){
-        String token = context.getRequest().getParameter("token");
+        String token = SpringContextUtil.getRequest().getParameter("token");
         String userId = JwtUtils.parse(token);
         HashMap<String, Article> article_list = new HashMap<>();
         Jedis jedis = null;
@@ -84,7 +84,8 @@ public class PostController {
 
     //发表文章
     @PostMapping("/public")
-    @TokenValidation(true)
+    @TokenValidation()
+    @ResponseBody
     public CommonReturnType publish(Article article){
 
         //todo  增加分类
@@ -119,9 +120,10 @@ public class PostController {
 
     @PostMapping("incr")
     @TokenValidation
+    @ResponseBody
     public CommonReturnType up(@RequestParam("article") String articleId) throws BusinessException {
         String id = articleId.split(":")[1];
-        String userid = contextUtil.getUserid();
+        String userid = SpringContextUtil.getUserid();
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
@@ -139,10 +141,20 @@ public class PostController {
         }finally {
             jedis.close();
         }
-        return CommonReturnType.create(null);
+       return getAllByTime();
+
     }
 
+    @GetMapping("/vote")
+    public String vote(){
 
+        return "vote";
+    }
+    @GetMapping("/vote2")
+    public String vote2(ModelMap modelMap){
+        modelMap.addAttribute("token","123123123");
+        return "test";
+
+    }
     // todo 踩
-
 }

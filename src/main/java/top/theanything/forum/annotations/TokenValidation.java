@@ -1,5 +1,6 @@
 package top.theanything.forum.annotations;
 
+
 import java.lang.annotation.*;
 
 /**

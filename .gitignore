@@ -9,4 +9,4 @@ out
 gen
 target
 
-/src/main/resources/html/examples/
+/src/main/resources/static/examples/

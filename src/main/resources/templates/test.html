@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/dist/js/jquery-3.3.1.js"></script>
+</head>
+<body>
+    <a id="aaa" th:text="${token}">111</a>
+</body>
+<script>
+
+    $(document).ready(function () {
+        alert(123)
+        var token = $("#aaa").text();
+        window.localStorage["token"] = token;
+    });
+
+</script>
+</html>

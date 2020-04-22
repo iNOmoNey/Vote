@@ -3,6 +3,7 @@ package top.theanything.forum.pojo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,6 +21,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 @Table(name ="user")
 public class User {
     @Id

@@ -1,1 +1,0 @@
-const host = "localhost";

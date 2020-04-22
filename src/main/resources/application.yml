@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8080
 
 mybatis:
   mapperLocations: classpath:mapping/*.xml
@@ -14,11 +14,16 @@ spring:
     #使用Druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-
+  thymeleaf:
+    cache: false
 bbs:
   encryption:
     seed: 0x3f2a3c7e
     salt: xzcawx
+  qq:
+    appid: 101813698
+    appkey: 7265da646c6cf33f6326f6844c1c4ef3
+    redirect: http%3A%2F%2F127.0.0.1%3A8080%2Flogin_qq
 top:
   jedis:
     host: localhost
@@ -26,4 +31,5 @@ top:
     select: 10
     MAX_IDLE: 10
     MAX_WAITMILLIS:
+
 

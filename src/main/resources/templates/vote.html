@@ -1,17 +1,22 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" >
+
+<script src="/static/dist/js/host.js"></script>
+<script src="/static/dist/js/jquery-3.3.1.js"></script>
+<script src="/static/dist/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="/dist/css/bootstrap.min.css">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="static/dist/css/bootstrap.css">
-    <script src="static/dist/js/jquery.min.js"></script>
-    <script src="static/dist/js/jquery-3.3.1.js"></script>
-    <script src="static/dist/js/host.js"></script>
+
 
 </head>
 <body>
 
 <div class="list-group">
+    <div id="token"   th:text="${token}"></div>
+
 <!--    <a href="#" class="list-group-item list-group-item-success">-->
 <!--        <button id="" type="button" class="btn btn-success">-->
 <!--            <span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span>-->
@@ -29,9 +34,17 @@
 
 <script>
     var article_list = [];
-    $(document).ready(function() {
 
-        var token = localStorage.getItem("token");
+
+    $(document).ready(function() {
+        var token = $("#token").text();
+        if (token.length == 0){
+            alert("现在token =0")
+            token = window.localStorage["token"];
+        }else{
+            window.localStorage["token"] = token;
+        }
+
         $.ajax({
             type: "GET",
             url: "http://"+host+"/post/getAllbyTime?token="+token,
@@ -43,18 +56,17 @@
                     article_list = data.data;
                     reloadDom();
                 } else {
-                    window.location.href="login.html";
-                    alert(data.data);
+                    window.location.href="http://"+host;
                 }
             },
             error: function(data) {
-                alert("获取商品信息失败，原因为" + data.responseText);
+                alert("获取商品信息失败，原因为123" + data.responseText);
             }
         });
     });
 
     function reloadDom() {
-
+        $(".list-group").html("");
         for (var key in article_list) {
             var k = key
            var dom = '<a  class="list-group-item list-group-item-success">\n' +
@@ -83,7 +95,8 @@
             },
             success: function(data) {
                 if (data.status == "success") {
-                    window.location.href="vote.html"
+                    article_list = data.data;
+                    reloadDom();
                 } else {
                     alert(data.data);
                 }

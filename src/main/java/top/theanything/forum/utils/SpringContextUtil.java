@@ -19,40 +19,40 @@ import javax.servlet.http.HttpServletRequest;
  * @Description
  * @createTime 2020年04月16日 16:22:00
  */
-@Component
+//@Component
 public class SpringContextUtil implements ApplicationContextAware {
 
     private static ApplicationContext context;
     private static final ThreadLocal<String> USERID = new ThreadLocal<>();
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public  void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         SpringContextUtil.context = applicationContext;
     }
 
-    public HttpServletRequest getRequest(){
+    public static HttpServletRequest getRequest(){
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
         return request;
     }
 
-    public void setUserid(String id){
+    public static void setUserid(String id){
         SpringContextUtil.USERID.set(id);
     }
 
-    public String getUserid(){
+    public static String getUserid(){
         return SpringContextUtil.USERID.get();
     }
 
-    public ApplicationContext getContext(){
+    public static ApplicationContext getContext(){
         return context;
     }
 
-    public Object getBeanByName(String name) {
+    public static Object getBeanByName(String name) {
         return context.getBean(name);
     }
 
-    public <T> T getBean(Class<T> clazz){
+    public static <T> T getBean(Class<T> clazz){
         return context.getBean(clazz);
     }
 }

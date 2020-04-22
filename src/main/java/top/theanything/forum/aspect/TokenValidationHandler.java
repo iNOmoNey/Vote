@@ -37,8 +37,7 @@ public class TokenValidationHandler {
 
 
 
-    @Autowired
-    private SpringContextUtil contextUtil;
+
 
     @Pointcut("execution(* top.theanything.forum.controller.*.*(..))")
     public void validation(){
@@ -51,17 +50,17 @@ public class TokenValidationHandler {
         if (null != annotation && !annotation.value() || null == annotation){
             return pjp.proceed();
         }
-        HttpServletRequest request = contextUtil.getRequest();
+        HttpServletRequest request = SpringContextUtil.getRequest();
 
         String userId;
         try {
-            String token = request.getParameterMap().get("token")[0];
+             String token = request.getParameterMap().get("token")[0];
              userId = JwtUtils.parse(token);
         }catch (Exception e){
-            log.warn("有个人没登录在乱搞，他的ip{}",contextUtil.getRequest().getRemoteHost());
+            log.warn("有个人没登录在乱搞，他的ip{}",SpringContextUtil.getRequest().getRemoteHost());
             return CommonReturnType.create("请登录","fail");
         }
-        contextUtil.setUserid(userId);
+        SpringContextUtil.setUserid(userId);
         return pjp.proceed();
     }
 
